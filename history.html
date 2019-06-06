@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html">
+  <title>中国大事记</title>
+  <meta name="author" content="Jake Rocheleau">
+  <link rel="shortcut icon" href="http://static.tmimgcdn.com/img/favicon.ico">
+  <link rel="icon" href="http://static.tmimgcdn.com/img/favicon.ico">
+  <link rel="stylesheet" type="text/css" media="all" href="css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/bootstrap-glyphicons.css">
+  <link rel="stylesheet" type="text/css" media="all" href="css/styles.css">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+
+<body>
+<div class="container" id="app">
+  <header class="page-header">
+    <h1>中国大事记</h1>
+  </header>
+  <ul class="timeline">
+
+    <div v-for="data in datas">
+      <li><div v-bind:class="['tldate',isHidden(data)]">{{data.date}}</div></li>
+    
+      <li v-bind:class="isInverted()">
+        <div class="timeline-panel">
+          <div class="tl-heading">
+            <h4>{{data.heading}}</h4>
+            <p></p>
+          </div>
+          <div class="tl-body">
+            <p>{{data.body}}</p>
+          </div>
+        </div>
+      </li>
+    </div>
+    
+  </ul>
+  <h2 style="position: relative;color: white" class="text-center">添加新事件</h2>
+  <ul class="timeline">
+    <li><div class="tldate"><input type="number" class="form-control text-center" placeholder="年份" v-model="newDate"></div></li>
+    
+    <li>
+      <div class="timeline-panel">
+        <div class="tl-heading">
+          <input type="text" class="form-control" placeholder="标题" v-model="newHeading">
+          <p></p>
+        </div>
+        <div class="tl-body">
+          <textarea class="form-control" placeholder="详情" v-model="newBody"></textarea>
+        </div>
+        <p></p>
+        <button class="btn btn-primary" @click="newThing();">提交</button>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<script>
+var vm=new Vue({
+    el: '#app',
+    data: {
+        datas:[],
+        inverted:true,
+        year:0,
+        newDate:'',
+        newHeading:'',
+        newBody:''
+    },
+    mounted(){
+      axios.get('http://localhost:8080/History/GetBigThings')
+      .then((response)=> {
+          this.datas=response.data;
+      })
+      .catch(function (error) {
+          console.log(error);
+      });
+    },
+    methods: {
+    isInverted() {
+      if(this.inverted){
+        this.inverted=false;
+        return "";
+      }
+      else{
+        this.inverted=true;
+        return "timeline-inverted";
+      }
+    },
+    isHidden(data){
+      if(data.date==this.year){
+        return "hidden";
+      }
+      else{
+        this.year=data.date;
+        return "";
+      }
+    },
+    newThing(){
+      if(this.newDate!==''&&this.newHeading!==''&&this.newBody!==''){
+        axios.get('http://localhost:8080/History/NewBigThing',{
+          params:{
+            date:this.newDate,
+            heading:this.newHeading,
+            body:this.newBody
+          }
+        })
+        .then((response)=> {
+          
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+        window.location.reload();
+      }
+      else{
+        window.alert('输入信息不全');
+      }
+    }
+  }
+})
+</script>
+</body>
+</html>

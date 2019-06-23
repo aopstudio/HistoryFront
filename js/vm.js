@@ -6,7 +6,7 @@ var vm=new Vue({
         newDate:'',
         newHeading:'',
         newBody:'',
-        theme:''
+        theme:'windows'
     },
     mounted(){
       var reg = new RegExp("(^|&)"+ 'theme' +"=([^&]*)(&|$)");
@@ -49,7 +49,8 @@ var vm=new Vue({
           params:{
             date:this.newDate,
             heading:this.newHeading,
-            body:this.newBody
+            body:this.newBody,
+            table:this.theme
           }
         })
         .then((response)=> {
@@ -70,7 +71,8 @@ var vm=new Vue({
     deleteThing(id,index){
       axios.get('http://localhost:8080/History/DeleteBigThing',{
           params:{
-            id:id
+            id:id,
+            table:this.theme
           }
         })
         .then((response)=> {
